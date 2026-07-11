@@ -1,0 +1,20 @@
+[Unit]
+Description=D.A.E.M.O.N. Personal AI Assistant
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# %h expands to the user's home directory; install path is configured by
+# scripts/install_autostart.py at install time.
+WorkingDirectory=__PROJECT_ROOT__
+ExecStart=__PROJECT_ROOT__/venv/bin/python __PROJECT_ROOT__/quickstart.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:__PROJECT_ROOT__/logs/daemon.log
+StandardError=append:__PROJECT_ROOT__/logs/daemon.log
+# Audio access for PipeWire / PulseAudio
+Environment=PULSE_RUNTIME_PATH=%t/pulse
+
+[Install]
+WantedBy=default.target

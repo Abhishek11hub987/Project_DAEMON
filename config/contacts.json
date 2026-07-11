@@ -1,0 +1,8 @@
+{
+    "_comment": "D.A.E.M.O.N. contacts — map friendly names to email/phone. Add your contacts here.",
+    "example": {
+        "email": "example@gmail.com",
+        "phone": "+919876543210",
+        "notes": "Example contact — replace with real contacts"
+    }
+}

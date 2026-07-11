@@ -1,0 +1,19 @@
+﻿Project D.A.E.M.O.N. - Project Notes (May 2026)
+
+D.A.E.M.O.N. (Data Analysis and Execution Monitor) is a personal AI voice assistant.
+It runs locally on a Windows machine and uses a hybrid LLM architecture: Ollama
+(llama3.2) handles fast everyday chat, while the Gemini Pro API is invoked for
+research-grade questions and document summarisation.
+
+Key milestones reached this month:
+- 12 May: Wake-word detection switched from Porcupine to openWakeWord.
+- 14 May: Edge-TTS neural voice (en-GB-RyanNeural) replaced robotic pyttsx3.
+- 18 May: System prompt rewritten to a J.A.R.V.I.S.-style butler tone.
+- 20 May: Gemini search skill added with optional Google Search grounding.
+
+Open items:
+- Custom 'daemon' wake-word model (requires ~10 minutes of audio samples).
+- Background-service polish on Linux (systemd unit needs sound.target tuning).
+- Add long-term memory via vector store (probably Chroma).
+
+Performance: avg first-token latency 320 ms locally, 1.4 s for Gemini calls.

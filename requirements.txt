@@ -1,0 +1,54 @@
+# Core Dependencies
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+numpy>=1.24.0
+
+# Audio I/O
+sounddevice>=0.4.6          # microphone capture (cross-platform, no compilation on Windows)
+openwakeword>=0.6.0         # wake-word detection (default: free, offline, no signup)
+pvporcupine>=3.0.0          # alternative wake-word engine (Picovoice key required)
+openai-whisper>=20231117    # speech-to-text
+piper-tts>=1.4.0            # offline neural TTS (FREE, OSS, default)
+edge-tts>=6.1.10            # cloud neural TTS (alternative, online, free)
+soundfile>=0.12.1           # audio playback for Edge-TTS / ElevenLabs MP3 output
+pyttsx3>=2.90               # offline TTS fallback (lower quality)
+
+# System monitoring
+psutil>=5.9.0
+
+# Global hotkeys (push-to-talk, mute) — optional, gracefully skipped if missing
+keyboard>=0.13.5
+
+# System tray icon (--tray mode) — optional
+pystray>=0.19.5
+pillow>=10.0.0
+
+# Web UI (--web mode) — FastAPI server + WebSocket
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+
+# LLM Integration
+requests>=2.31.0
+# Cloud LLM SDKs (install whichever backend you use; matched to LLM_BACKEND in .env)
+groq>=0.11.0
+ddgs>=9.0.0                 # DuckDuckGo search (FREE, OSS, no API key) — used by web_search_skill
+google-genai>=1.0.0         # Google Gemini API (optional; used only if SEARCH_ENGINE=gemini)
+openai>=1.40.0
+
+# PDF/Document Processing
+PyPDF2>=3.0.1
+pdfplumber>=0.10.3
+
+# Task Scheduling
+APScheduler>=3.10.4
+
+# Logging & Monitoring
+python-json-logger>=2.0.7
+
+# Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+
+# Development (optional)
+black>=23.12.0
+flake8>=6.1.0

@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>D.A.E.M.O.N. — Control Center</title>
+  <meta name="description" content="D.A.E.M.O.N. AI Personal Assistant Control Center" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* =============================================
+       DESIGN SYSTEM — Glassmorphic Dark
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+
+    :root {
+      --accent:    #00e5ff;
+      --accent2:   #00b8d4;
+      --accent-dim: rgba(0,229,255,0.12);
+      --accent-glow: 0 0 12px rgba(0,229,255,0.3);
+      --green:     #00e676;
+      --yellow:    #ffd740;
+      --red:       #ff5252;
+      --purple:    #b388ff;
+      --bg-deep:   #0a0e17;
+      --bg-panel:  rgba(12,18,30,0.85);
+      --bg-glass:  rgba(15,22,40,0.6);
+      --bg-card:   rgba(20,28,50,0.5);
+      --border:    rgba(0,229,255,0.12);
+      --border-hi: rgba(0,229,255,0.3);
+      --text:      #e0f0ff;
+      --text-dim:  rgba(180,210,240,0.55);
+      --text-muted: rgba(140,170,210,0.35);
+      --font:      'Inter', -apple-system, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+      --radius:    10px;
+      --radius-sm: 6px;
+    }
+
+    body {
+      font-family: var(--font);
+      font-size: 0.875rem;
+      color: var(--text);
+      background: var(--bg-deep);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 20% 0%, rgba(0,229,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(120,80,255,0.05) 0%, transparent 60%);
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    .hidden { display: none !important; }
+    button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+    textarea, input { font-family: inherit; outline: none; }
+
+    /* =============================================
+       LAYOUT — 3-column grid
+    ============================================= */
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr 250px;
+      grid-template-rows: 52px 1fr 36px;
+      grid-template-areas:
+        "topbar  topbar  topbar"
+        "left    center  right"
+        "footer  footer  footer";
+      width: 100vw; height: 100vh;
+      gap: 0;
+    }
+
+    /* =============================================
+       TOP BAR
+    ============================================= */
+    .topbar {
+      grid-area: topbar;
+      display: flex; align-items: center;
+      background: var(--bg-panel);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      margin-right: 20px; flex-shrink: 0;
+    }
+    .brand-ring {
+      width: 30px; height: 30px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      position: relative;
+      animation: ring-spin 6s linear infinite;
+      box-shadow: var(--accent-glow);
+    }
+    .brand-ring::before {
+      content: ''; position: absolute;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); box-shadow: var(--accent-glow);
+      top: -3px; left: 50%; transform: translateX(-50%);
+    }
+    .brand-ring::after {
+      content: ''; position: absolute;
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1.5px solid rgba(0,229,255,0.4);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: ring-spin 3s linear infinite reverse;
+    }
+    @keyframes ring-spin { to { transform: rotate(360deg); } }
+
+    .brand-name {
+      font-size: 14px; font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 3px;
+    }
+    .brand-sub {
+      font-size: 9px; color: var(--text-dim);
+      letter-spacing: 1px; margin-top: 1px;
+    }
+
+    .nav-tabs { display: flex; gap: 2px; flex: 1; }
+    .nav-tab {
+      padding: 6px 14px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-dim);
+      font-size: 12px; font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-tab:hover {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-color: var(--border);
+    }
+    .nav-tab.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-color: var(--border-hi);
+      box-shadow: var(--accent-glow);
+    }
+    .nav-tab i { font-size: 11px; }
+
+    .topbar-right {
+      display: flex; align-items: center; gap: 12px;
+      margin-left: auto;
+    }
+    .backend-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      background: rgba(0,230,118,0.08);
+      border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 20px;
+      font-size: 10px; font-weight: 500;
+      color: var(--green);
+      letter-spacing: 0.5px;
+    }
+    .backend-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    #hud-clock {
+      font-family: var(--font-mono);
+      font-size: 14px; font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+    #hud-date {
+      font-size: 10px; color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* =============================================
+       LEFT SIDEBAR
+    ============================================= */
+    .left-panel {
+      grid-area: left;
+      background: var(--bg-panel);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .section-title {
+      padding: 10px 14px 6px;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .section-title .icon-btn {
+      background: none; color: var(--text-muted);
+      font-size: 11px; transition: color 0.2s;
+    }
+    .section-title .icon-btn:hover { color: var(--accent); }
+
+    /* Quick actions */
+    .quick-actions {
+      display: flex; flex-direction: column;
+      gap: 3px; padding: 4px 8px 8px;
+    }
+    .action-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-dim);
+      font-size: 12px; font-weight: 500;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .action-btn i {
+      width: 16px; text-align: center;
+      font-size: 13px; color: var(--accent);
+      opacity: 0.7; transition: opacity 0.2s;
+    }
+    .action-btn:hover {
+      background: var(--accent-dim);
+      border-color: var(--border-hi);
+      color: var(--text);
+      transform: translateX(3px);
+    }
+    .action-btn:hover i { opacity: 1; }
+    .action-btn:active { transform: translateX(1px); }
+
+    /* Session list */
+    .sessions-section {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+    .session-list {
+      list-style: none; padding: 4px 8px;
+      flex: 1; overflow-y: auto;
+    }
+    .session-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      margin-bottom: 2px;
+      transition: all 0.15s;
+      color: var(--text-dim);
+    }
+    .session-row:hover {
+      background: var(--accent-dim);
+      color: var(--text);
+    }
+    .session-row.active {
+      background: rgba(0,229,255,0.1);
+      border: 1px solid var(--border-hi);
+      color: var(--accent);
+    }
+    .session-row .meta { flex: 1; min-width: 0; }
+    .session-row .row-title {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-size: 12px; font-weight: 500;
+    }
+    .session-row .row-sub {
+      font-size: 10px; color: var(--text-muted);
+      display: flex; align-items: center; gap: 4px; margin-top: 2px;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); display: inline-block;
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 1.5s infinite;
+    }
+    .del-btn {
+      background: transparent; color: var(--text-muted);
+      padding: 2px 4px; opacity: 0; transition: opacity 0.15s;
+      font-size: 11px; border: none; border-radius: 3px;
+    }
+    .session-row:hover .del-btn { opacity: 1; }
+    .del-btn:hover { color: var(--red); }
+
+    /* =============================================
+       CENTER — CHAT AREA
+    ============================================= */
+    .center-panel {
+      grid-area: center;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 16px;
+      background: var(--bg-glass);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .status-indicator {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(0,229,255,0.3);
+      transition: all 0.3s;
+    }
+    .status-dot.idle      { background: rgba(0,229,255,0.3); }
+    .status-dot.listening { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1s infinite; }
+    .status-dot.thinking  { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .status-dot.speaking  { background: #64b5f6; box-shadow: 0 0 8px #64b5f6; animation: pulse 0.8s infinite; }
+    .status-dot.error     { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    #status-label { color: var(--text-dim); }
+    #session-title { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+
+    /* Messages */
+    .messages {
+      flex: 1; overflow-y: auto;
+      padding: 12px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .empty-state {
+      flex: 1; display: grid; place-items: center; text-align: center;
+      color: var(--text-dim);
+    }
+    .empty-state .empty-icon {
+      width: 80px; height: 80px;
+      border: 2px solid var(--border-hi);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      margin: 0 auto 16px;
+      animation: ring-spin 8s linear infinite;
+      box-shadow: var(--accent-glow);
+    }
+    .empty-state .empty-icon i {
+      font-size: 28px; color: var(--accent); opacity: 0.7;
+      animation: ring-spin 8s linear infinite reverse;
+    }
+    .empty-state h2 {
+      font-size: 18px; font-weight: 600;
+      color: var(--accent); margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+    .empty-state p {
+      font-size: 12px; line-height: 1.8; color: var(--text-dim);
+      max-width: 380px;
+    }
+    .empty-state b { color: var(--accent); }
+
+    .row { display: flex; }
+    .row.user      { justify-content: flex-end; }
+    .row.assistant { justify-content: flex-start; }
+    .bubble {
+      max-width: 78%;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      word-wrap: break-word;
+      font-size: 13px; line-height: 1.6;
+    }
+    .bubble .body { white-space: pre-wrap; }
+    .bubble .ts   { font-size: 10px; margin-top: 4px; opacity: 0.4; }
+    .row.user .bubble {
+      background: rgba(0,229,255,0.1);
+      border: 1px solid rgba(0,229,255,0.2);
+      color: var(--text);
+      border-radius: var(--radius) var(--radius) 4px var(--radius);
+    }
+    .row.assistant .bubble {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: rgba(210,230,255,0.9);
+      border-radius: var(--radius) var(--radius) var(--radius) 4px;
+    }
+    .typing span {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      margin: 0 2px;
+      animation: blink 1.2s infinite ease-in-out;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100% { opacity: 0.2; } 40% { opacity: 1; } }
+
+    /* Input area */
+    .input-area {
+      padding: 10px 16px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+    }
+    .input-row { display: flex; gap: 8px; align-items: flex-end; }
+    .input-row textarea {
+      flex: 1;
+      min-height: 40px; max-height: 120px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 10px 14px;
+      font-size: 13px;
+      resize: none;
+      transition: border-color 0.2s;
+    }
+    .input-row textarea::placeholder { color: var(--text-muted); }
+    .input-row textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,229,255,0.08); }
+    .send-btn {
+      padding: 10px 18px;
+      background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(0,229,255,0.08));
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+      color: var(--accent);
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .send-btn:hover { background: rgba(0,229,255,0.2); box-shadow: var(--accent-glow); }
+    .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .hint-row {
+      display: flex; gap: 12px; align-items: center;
+      font-size: 10px; color: var(--text-muted);
+      margin-top: 6px; padding-left: 2px;
+    }
+    .hint-row kbd {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 1px 6px; border-radius: 3px;
+      font-family: var(--font-mono); font-size: 9px;
+    }
+
+    /* =============================================
+       RIGHT SIDEBAR
+    ============================================= */
+    .right-panel {
+      grid-area: right;
+      background: var(--bg-panel);
+      backdrop-filter: blur(16px);
+      border-left: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+
+    /* Telemetry gauges */
+    .telemetry-section { padding: 8px 12px; }
+    .gauge-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 8px;
+    }
+    .gauge-label {
+      min-width: 34px; text-align: right;
+      color: var(--text-muted);
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .gauge-bar {
+      flex: 1; height: 6px;
+      background: rgba(0,229,255,0.06);
+      border-radius: 3px; overflow: hidden;
+    }
+    .gauge-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 3px;
+      transition: width 0.6s ease, background 0.6s ease;
+    }
+    .gauge-fill.warn {
+      background: linear-gradient(90deg, #ff9800, var(--yellow));
+    }
+    .gauge-fill.crit {
+      background: linear-gradient(90deg, #f44336, var(--red));
+    }
+    .gauge-val {
+      min-width: 34px; text-align: right;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 500;
+    }
+    .stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4px 10px; padding: 4px 0;
+    }
+    .stat-item { display: flex; justify-content: space-between; }
+    .stat-label { color: var(--text-muted); font-size: 10px; }
+    .stat-val { color: var(--accent); font-family: var(--font-mono); font-size: 10px; }
+
+    /* Agent roster */
+    .agents-section { padding: 8px 12px; }
+    .agent-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .agent-card:hover {
+      border-color: var(--border-hi);
+      background: var(--accent-dim);
+    }
+    .agent-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 12px;
+      border: 1.5px solid;
+      flex-shrink: 0;
+    }
+    .agent-avatar.cipher { border-color: var(--red); color: var(--red); background: rgba(255,82,82,0.08); }
+    .agent-avatar.forge  { border-color: var(--yellow); color: var(--yellow); background: rgba(255,215,64,0.08); }
+    .agent-avatar.nova   { border-color: var(--purple); color: var(--purple); background: rgba(179,136,255,0.08); }
+    .agent-info { flex: 1; min-width: 0; }
+    .agent-name {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .agent-role {
+      font-size: 9px; color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .agent-status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(0,229,255,0.3);
+      flex-shrink: 0;
+    }
+    .agent-status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 1.5s infinite; }
+
+    /* Controls */
+    .controls-section {
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .ctrl-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-dim);
+      font-size: 11px; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .ctrl-btn i { width: 14px; text-align: center; }
+    .ctrl-btn:hover {
+      background: var(--accent-dim);
+      color: var(--text);
+      border-color: var(--border-hi);
+    }
+    .ctrl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .ctrl-btn.danger { border-color: rgba(255,82,82,0.2); color: rgba(255,120,120,0.7); }
+    .ctrl-btn.danger:hover { background: rgba(255,82,82,0.1); border-color: var(--red); color: var(--red); }
+    .ctrl-btn.muted {
+      background: rgba(255,82,82,0.1);
+      border-color: rgba(255,82,82,0.4);
+      color: var(--red);
+    }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    .footer {
+      grid-area: footer;
+      display: flex; align-items: center;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      padding: 0 16px;
+      gap: 16px;
+      font-size: 10px;
+    }
+    .footer-item {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text-muted);
+    }
+    .footer-item .val { color: var(--text-dim); font-family: var(--font-mono); }
+    .footer-quote {
+      flex: 1; text-align: right;
+      color: var(--text-muted);
+      font-style: italic;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-size: 10px;
+    }
+
+    /* =============================================
+       QUICK ACTION MODALS
+    ============================================= */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(5,8,15,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: grid; place-items: center;
+      animation: fadeIn 0.15s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 420px; max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), var(--accent-glow);
+      animation: slideUp 0.2s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal h3 {
+      font-size: 15px; font-weight: 600;
+      color: var(--accent); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .modal label {
+      display: block; margin-bottom: 4px;
+      font-size: 11px; color: var(--text-dim);
+      font-weight: 500; letter-spacing: 0.5px;
+    }
+    .modal input, .modal textarea {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .modal input:focus, .modal textarea:focus {
+      border-color: var(--accent);
+    }
+    .modal textarea { resize: vertical; min-height: 60px; }
+    .modal-actions {
+      display: flex; gap: 8px; justify-content: flex-end;
+      margin-top: 8px;
+    }
+    .modal-btn {
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .modal-btn.primary {
+      background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,229,255,0.1));
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+    .modal-btn.primary:hover { background: rgba(0,229,255,0.25); box-shadow: var(--accent-glow); }
+    .modal-btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+    .modal-btn.secondary:hover { background: var(--accent-dim); color: var(--text); }
+
+    /* =============================================
+       TAB VIEWS (hidden by default)
+    ============================================= */
+    .tab-view { display: none; flex: 1; overflow-y: auto; padding: 20px; }
+    .tab-view.active { display: block; }
+
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .skill-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      transition: all 0.2s;
+    }
+    .skill-card:hover {
+      border-color: var(--border-hi);
+      box-shadow: var(--accent-glow);
+      transform: translateY(-2px);
+    }
+    .skill-card .skill-icon {
+      font-size: 22px; margin-bottom: 8px;
+    }
+    .skill-card .skill-name {
+      font-size: 13px; font-weight: 600;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .skill-card .skill-desc {
+      font-size: 11px; color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .skill-card .skill-badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .skill-badge.active { background: rgba(0,230,118,0.1); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+    .skill-badge.partial { background: rgba(255,215,64,0.1); color: var(--yellow); border: 1px solid rgba(255,215,64,0.3); }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 50px; right: 16px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 500;
+      background: rgba(255,82,82,0.12);
+      border: 1px solid rgba(255,82,82,0.3);
+      color: var(--red);
+      z-index: 9999;
+      animation: slideIn 0.2s ease-out;
+      pointer-events: none;
+    }
+    .toast.ok {
+      background: rgba(0,229,255,0.1);
+      border-color: rgba(0,229,255,0.3);
+      color: var(--accent);
+    }
+    @keyframes slideIn {
+      from { transform: translateX(20px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 52px 1fr 36px;
+        grid-template-areas: "topbar" "center" "footer";
+      }
+      .left-panel, .right-panel { display: none; }
+      .nav-tabs { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-ring"></div>
+      <div>
+        <div class="brand-name">D.A.E.M.O.N.</div>
+        <div class="brand-sub">Control Center</div>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="home">
+        <i class="fa fa-comments"></i> Chat
+      </button>
+      <button class="nav-tab" data-tab="skills">
+        <i class="fa fa-bolt"></i> Skills
+      </button>
+      <button class="nav-tab" data-tab="agents">
+        <i class="fa fa-users"></i> Agents
+      </button>
+      <button class="nav-tab" data-tab="system">
+        <i class="fa fa-chart-line"></i> System
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <div class="backend-badge" id="backend-badge">
+        <span class="dot"></span>
+        <span id="backend-label">GROQ</span>
+      </div>
+      <div>
+        <div id="hud-clock">00:00:00</div>
+        <div id="hud-date">---</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== LEFT SIDEBAR ===== -->
+  <aside class="left-panel">
+    <div class="section-title">
+      Quick Actions
+    </div>
+    <div class="quick-actions">
+      <button class="action-btn" data-action="email">
+        <i class="fa fa-envelope"></i> Send Email
+      </button>
+      <button class="action-btn" data-action="web-build">
+        <i class="fa fa-globe"></i> Build Website
+      </button>
+      <button class="action-btn" data-action="search">
+        <i class="fa fa-search"></i> Web Search
+      </button>
+      <button class="action-btn" data-action="sysinfo">
+        <i class="fa fa-microchip"></i> System Info
+      </button>
+      <button class="action-btn" data-action="briefing">
+        <i class="fa fa-newspaper"></i> Briefing
+      </button>
+      <button class="action-btn" data-action="files">
+        <i class="fa fa-folder-open"></i> File Manager
+      </button>
+      <button class="action-btn" data-action="calculator">
+        <i class="fa fa-calculator"></i> Calculator
+      </button>
+    </div>
+
+    <div class="sessions-section">
+      <div class="section-title">
+        Conversations
+        <button class="icon-btn" id="refresh-btn" title="Refresh"><i class="fa fa-refresh"></i></button>
+      </div>
+      <ul id="session-list" class="session-list"></ul>
+    </div>
+  </aside>
+
+  <!-- ===== CENTER PANEL ===== -->
+  <main class="center-panel">
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="status-indicator">
+        <div id="status-dot" class="status-dot idle"></div>
+        <span id="status-label">IDLE — SAY "DAEMON"</span>
+      </div>
+      <span id="session-title"></span>
+    </div>
+
+    <!-- Tab: Home (Chat) -->
+    <div class="tab-view active" id="tab-home">
+      <section id="messages" class="messages" style="padding:0;">
+        <div id="empty-state" class="empty-state">
+          <div>
+            <div class="empty-icon"><i class="fa fa-bolt"></i></div>
+            <h2>DAEMON ONLINE</h2>
+            <p>
+              Say <b>"Daemon"</b> followed by your question,<br>
+              or type below. Use the <b>Quick Actions</b> on the left<br>
+              to send emails, build websites, or search the web.<br>
+              Say <b>"thanks"</b> or <b>"bye"</b> to end a session.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab: Skills -->
+    <div class="tab-view" id="tab-skills">
+      <h2 style="font-size:16px;color:var(--accent);margin-bottom:16px;letter-spacing:1px;">Installed Skills</h2>
+      <div class="skill-grid" id="skills-grid">
+        <div class="skill-card">
+          <div class="skill-icon">🕐</div>
+          <div class="skill-name">Time</div>
+          <div class="skill-desc">Tell the current time and date</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">🧮</div>
+          <div class="skill-name">Calculator</div>
+          <div class="skill-desc">Evaluate math expressions</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">💻</div>
+          <div class="skill-name">System Monitor</div>
+          <div class="skill-desc">CPU, RAM, disk, battery stats</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">📁</div>
+          <div class="skill-name">File Manager</div>
+          <div class="skill-desc">Create, read, list, and search files</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">📄</div>
+          <div class="skill-name">Document Reader</div>
+          <div class="skill-desc">Summarize PDFs, DOCX, TXT files</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">🔍</div>
+          <div class="skill-name">Web Search</div>
+          <div class="skill-desc">DuckDuckGo and Gemini search</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">⚙️</div>
+          <div class="skill-name">C Integration</div>
+          <div class="skill-desc">Compile and run C programs</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">🌐</div>
+          <div class="skill-name">Website Builder</div>
+          <div class="skill-desc">Generate full websites from voice commands</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">📧</div>
+          <div class="skill-name">Messaging</div>
+          <div class="skill-desc">Send emails via SMTP and WhatsApp</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">🧠</div>
+          <div class="skill-name">RAG Knowledge</div>
+          <div class="skill-desc">Search your documents and code for grounded answers</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">📋</div>
+          <div class="skill-name">Briefing</div>
+          <div class="skill-desc">Morning briefing with email and GitHub digest</div>
+          <span class="skill-badge active">ACTIVE</span>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">⏰</div>
+          <div class="skill-name">Reminders</div>
+          <div class="skill-desc">Set timed reminders (not yet wired)</div>
+          <span class="skill-badge partial">PARTIAL</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Agents -->
+    <div class="tab-view" id="tab-agents">
+      <h2 style="font-size:16px;color:var(--accent);margin-bottom:16px;letter-spacing:1px;">AI Agents</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;">
+        <div class="skill-card" style="border-color:rgba(255,82,82,0.2);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div class="agent-avatar cipher"><i class="fa fa-shield-halved"></i></div>
+            <div><div class="skill-name" style="color:var(--red);">Cipher</div><div class="agent-role">Security & Code Review</div></div>
+          </div>
+          <div class="skill-desc">Analyzes code for vulnerabilities, memory leaks, and security issues. Reviews C modules and system code.</div>
+        </div>
+        <div class="skill-card" style="border-color:rgba(255,215,64,0.2);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div class="agent-avatar forge"><i class="fa fa-hammer"></i></div>
+            <div><div class="skill-name" style="color:var(--yellow);">Forge</div><div class="agent-role">Code Generation</div></div>
+          </div>
+          <div class="skill-desc">Generates production-ready code, creates files, and builds features. Handles multi-file project scaffolding.</div>
+        </div>
+        <div class="skill-card" style="border-color:rgba(179,136,255,0.2);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div class="agent-avatar nova"><i class="fa fa-palette"></i></div>
+            <div><div class="skill-name" style="color:var(--purple);">Nova</div><div class="agent-role">Creative & UI/UX</div></div>
+          </div>
+          <div class="skill-desc">Designs interfaces, writes creative content, and handles UI/UX tasks. Generates HTML/CSS layouts.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: System -->
+    <div class="tab-view" id="tab-system">
+      <h2 style="font-size:16px;color:var(--accent);margin-bottom:16px;letter-spacing:1px;">System Dashboard</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="skill-card">
+          <div class="skill-name" style="margin-bottom:10px;"><i class="fa fa-microchip" style="color:var(--accent);margin-right:6px;"></i>CPU Usage</div>
+          <div class="gauge-row"><div class="gauge-bar" style="height:10px;"><div class="gauge-fill" id="sys-cpu-fill"></div></div><span class="gauge-val" id="sys-cpu-val">—%</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name" style="margin-bottom:10px;"><i class="fa fa-memory" style="color:var(--accent);margin-right:6px;"></i>RAM Usage</div>
+          <div class="gauge-row"><div class="gauge-bar" style="height:10px;"><div class="gauge-fill" id="sys-ram-fill"></div></div><span class="gauge-val" id="sys-ram-val">—%</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name" style="margin-bottom:10px;"><i class="fa fa-hard-drive" style="color:var(--accent);margin-right:6px;"></i>Disk Usage</div>
+          <div class="gauge-row"><div class="gauge-bar" style="height:10px;"><div class="gauge-fill" id="sys-disk-fill"></div></div><span class="gauge-val" id="sys-disk-val">—%</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name" style="margin-bottom:10px;"><i class="fa fa-battery-full" style="color:var(--accent);margin-right:6px;"></i>Battery</div>
+          <div class="gauge-row"><div class="gauge-bar" style="height:10px;"><div class="gauge-fill" id="sys-batt-fill"></div></div><span class="gauge-val" id="sys-batt-val">—%</span></div>
+        </div>
+      </div>
+      <div class="skill-card" style="margin-top:12px;">
+        <div class="skill-name" style="margin-bottom:10px;"><i class="fa fa-info-circle" style="color:var(--accent);margin-right:6px;"></i>System Details</div>
+        <div class="stat-grid" id="sys-details">
+          <div class="stat-item"><span class="stat-label">Processes</span><span class="stat-val" id="sys-procs">—</span></div>
+          <div class="stat-item"><span class="stat-label">Uptime</span><span class="stat-val" id="sys-uptime">—</span></div>
+          <div class="stat-item"><span class="stat-label">Net ↑</span><span class="stat-val" id="sys-net-up">—</span></div>
+          <div class="stat-item"><span class="stat-label">Net ↓</span><span class="stat-val" id="sys-net-dn">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input area (always visible) -->
+    <div class="input-area">
+      <form id="text-form" class="input-row" autocomplete="off">
+        <textarea id="text-input" rows="1"
+          placeholder="Type a command or ask a question…"></textarea>
+        <button type="submit" id="send-btn" class="send-btn">
+          <i class="fa fa-paper-plane"></i> Send
+        </button>
+      </form>
+      <div class="hint-row">
+        <span>Voice:</span> Say <kbd>Daemon</kbd>
+        <span>PTT:</span><kbd>Ctrl+Alt+Space</kbd>
+        <span>Mute:</span><kbd>Ctrl+Alt+M</kbd>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== RIGHT SIDEBAR ===== -->
+  <aside class="right-panel">
+    <div class="section-title">System Vitals</div>
+    <div class="telemetry-section" id="telemetry-panel">
+      <div class="gauge-row">
+        <span class="gauge-label">CPU</span>
+        <div class="gauge-bar"><div class="gauge-fill" id="cpu-fill"></div></div>
+        <span class="gauge-val" id="cpu-val">—%</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">RAM</span>
+        <div class="gauge-bar"><div class="gauge-fill" id="ram-fill"></div></div>
+        <span class="gauge-val" id="ram-val">—%</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">DISK</span>
+        <div class="gauge-bar"><div class="gauge-fill" id="disk-fill"></div></div>
+        <span class="gauge-val" id="disk-val">—%</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-item"><span class="stat-label">Procs</span><span class="stat-val" id="proc-count">—</span></div>
+        <div class="stat-item"><span class="stat-label">Uptime</span><span class="stat-val" id="uptime-val">—</span></div>
+        <div class="stat-item"><span class="stat-label">Net ↑</span><span class="stat-val" id="net-up-val">—</span></div>
+        <div class="stat-item"><span class="stat-label">Net ↓</span><span class="stat-val" id="net-dn-val">—</span></div>
+      </div>
+    </div>
+
+    <!-- Agent Roster -->
+    <div class="section-title">Agents</div>
+    <div class="agents-section" id="agents-panel">
+      <div class="agent-card">
+        <div class="agent-avatar cipher"><i class="fa fa-shield-halved"></i></div>
+        <div class="agent-info">
+          <div class="agent-name">Cipher</div>
+          <div class="agent-role">Security</div>
+        </div>
+        <div class="agent-status-dot" id="agent-cipher-dot"></div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-avatar forge"><i class="fa fa-hammer"></i></div>
+        <div class="agent-info">
+          <div class="agent-name">Forge</div>
+          <div class="agent-role">Builder</div>
+        </div>
+        <div class="agent-status-dot" id="agent-forge-dot"></div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-avatar nova"><i class="fa fa-palette"></i></div>
+        <div class="agent-info">
+          <div class="agent-name">Nova</div>
+          <div class="agent-role">Creative</div>
+        </div>
+        <div class="agent-status-dot" id="agent-nova-dot"></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-section">
+      <div class="section-title" style="padding:0 0 6px;">Controls</div>
+      <button class="ctrl-btn" id="mute-btn" data-muted="false">
+        <i class="fa fa-microphone" id="mute-icon"></i>
+        <span id="mute-label">Mute Mic</span>
+      </button>
+      <button class="ctrl-btn" id="briefing-btn">
+        <i class="fa fa-newspaper"></i> Get Briefing
+      </button>
+      <button class="ctrl-btn danger" id="end-btn" disabled>
+        <i class="fa fa-power-off"></i> End Session
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-item">
+      <i class="fa fa-battery-full" style="color:var(--green);"></i>
+      <span class="val" id="batt-pct">—%</span>
+    </div>
+    <div class="footer-item">
+      <i class="fa fa-wifi" style="color:var(--accent);"></i>
+      <span class="val" id="footer-net">Connected</span>
+    </div>
+    <div class="footer-item">
+      <i class="fa fa-database" style="color:var(--purple);"></i>
+      <span class="val" id="footer-rag">RAG Ready</span>
+    </div>
+    <div class="footer-quote">
+      "The best way to predict the future is to invent it." — Alan Kay
+    </div>
+  </footer>
+
+</div><!-- .app -->
+
+<!-- Modal container -->
+<div id="modal-container"></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+  // ==================== STATE ====================
+  const STATE_LABELS = {
+    idle:      'IDLE — SAY "DAEMON"',
+    listening: 'LISTENING...',
+    thinking:  'PROCESSING...',
+    speaking:  'SPEAKING...',
+    error:     'ERROR',
+  };
+  let currentSessionId = null;
+  let activeSessionId  = null;
+  let sessions = [];
+
+  // ==================== HELPERS ====================
+  const $ = (id) => document.getElementById(id);
+  const messagesEl    = $("messages");
+  const sessionListEl = $("session-list");
+  const emptyStateEl  = $("empty-state");
+
+  function escapeHtml(s) {
+    return (s || "").replace(/[&<>"']/g, (c) =>
+      ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+  }
+  function formatTime(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(+d)) return "";
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dd = new Date(d);   dd.setHours(0,0,0,0);
+    if (+today === +dd) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleDateString([], { month: "short", day: "numeric" });
+  }
+  function setStatus(state) {
+    const dot = $("status-dot");
+    dot.className = "status-dot " + (STATE_LABELS[state] ? state : "idle");
+    $("status-label").textContent = STATE_LABELS[state] || STATE_LABELS.idle;
+  }
+  function setActiveSession(id) {
+    activeSessionId = id;
+    $("end-btn").disabled = !id;
+    document.querySelectorAll(".session-row").forEach((el) => {
+      el.classList.toggle("active", el.dataset.id === currentSessionId);
+      const ld = el.querySelector(".live-dot");
+      if (ld) ld.classList.toggle("hidden", el.dataset.id !== id);
+    });
+  }
+  function setHeaderTitle(title) {
+    $("session-title").textContent = title || "";
+  }
+  function showEmptyState(show) {
+    emptyStateEl.classList.toggle("hidden", !show);
+  }
+  function showToast(msg, ok = false) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.toggle("ok", ok);
+    t.classList.remove("hidden");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => t.classList.add("hidden"), 3500);
+  }
+
+  // ==================== RENDERING ====================
+  function renderSessions() {
+    sessionListEl.innerHTML = "";
+    if (!sessions.length) {
+      sessionListEl.innerHTML = '<li style="padding:12px;color:var(--text-muted);font-size:11px;text-align:center;">No conversations yet</li>';
+      return;
+    }
+    sessions.forEach((s) => {
+      const li = document.createElement("li");
+      li.className = "session-row" + (s.id === currentSessionId ? " active" : "");
+      li.dataset.id = s.id;
+      const isLive = s.id === activeSessionId;
+      const title = s.title || s.id;
+      const sub = formatTime(s.started_at || s.start_time);
+      li.innerHTML = `
+        <i class="fa fa-message" style="font-size:11px;color:var(--text-muted);"></i>
+        <div class="meta">
+          <div class="row-title">${escapeHtml(title)}</div>
+          <div class="row-sub">
+            <span class="live-dot${isLive ? '' : ' hidden'}"></span>
+            ${sub}
+          </div>
+        </div>
+        <button class="del-btn" title="Delete"><i class="fa fa-trash"></i></button>`;
+      li.querySelector(".del-btn").onclick = (e) => { e.stopPropagation(); deleteSession(s.id); };
+      li.onclick = () => loadSession(s.id);
+      sessionListEl.appendChild(li);
+    });
+  }
+
+  function addBubble(role, text) {
+    showEmptyState(false);
+    // Remove typing indicator if present
+    const tp = messagesEl.querySelector(".typing-row");
+    if (tp) tp.remove();
+
+    const row = document.createElement("div");
+    row.className = "row " + role;
+    const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    row.innerHTML = `<div class="bubble"><div class="body">${escapeHtml(text)}</div><div class="ts">${ts}</div></div>`;
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping() {
+    if (messagesEl.querySelector(".typing-row")) return;
+    const row = document.createElement("div");
+    row.className = "row assistant typing-row";
+    row.innerHTML = '<div class="bubble typing"><span></span><span></span><span></span></div>';
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // ==================== API ====================
+  async function sendText(text) {
+    if (!text.trim()) return;
+    addBubble("user", text);
+    showTyping();
+    $("send-btn").disabled = true;
+
+    try {
+      const res = await fetch("/api/text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      // Response comes through WebSocket, but also via HTTP
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch (e) {
+      showToast("Command failed: " + e.message);
+    } finally {
+      $("send-btn").disabled = false;
+    }
+  }
+
+  async function fetchSessions() {
+    try {
+      const res = await fetch("/api/sessions");
+      sessions = await res.json();
+      sessions.sort((a, b) => (b.started_at || b.start_time || "").localeCompare(a.started_at || a.start_time || ""));
+      renderSessions();
+    } catch (e) { console.warn("session fetch:", e); }
+  }
+
+  async function loadSession(id) {
+    currentSessionId = id;
+    renderSessions();
+    try {
+      const res = await fetch("/api/sessions/" + id);
+      const s = await res.json();
+      messagesEl.innerHTML = "";
+      showEmptyState(false);
+      setHeaderTitle(s.title || id);
+      (s.turns || []).forEach((t) => addBubble(t.role, t.content));
+    } catch (e) { showToast("Failed to load session"); }
+  }
+
+  async function deleteSession(id) {
+    try {
+      await fetch("/api/sessions/" + id, { method: "DELETE" });
+      if (currentSessionId === id) {
+        currentSessionId = null;
+        messagesEl.innerHTML = "";
+        showEmptyState(true);
+        setHeaderTitle("");
+      }
+      await fetchSessions();
+      showToast("Session deleted", true);
+    } catch (e) { showToast("Delete failed"); }
+  }
+
+  async function toggleMute() {
+    try {
+      const res = await fetch("/api/mute", { method: "POST" });
+      const { muted } = await res.json();
+      updateMuteUI(muted);
+    } catch (e) { showToast("Mute toggle failed"); }
+  }
+
+  function updateMuteUI(muted) {
+    const btn = $("mute-btn");
+    const icon = $("mute-icon");
+    const label = $("mute-label");
+    btn.dataset.muted = muted;
+    btn.classList.toggle("muted", muted);
+    icon.className = muted ? "fa fa-microphone-slash" : "fa fa-microphone";
+    label.textContent = muted ? "Unmute" : "Mute Mic";
+  }
+
+  async function endSession() {
+    if (!activeSessionId) return;
+    try {
+      await fetch("/api/sessions/" + activeSessionId + "/end", { method: "POST" });
+    } catch (e) { showToast("End session failed"); }
+  }
+
+  async function getBriefing() {
+    showToast("Generating briefing...", true);
+    try {
+      const res = await fetch("/api/briefing");
+      const data = await res.json();
+      if (data.briefing) {
+        addBubble("assistant", data.briefing);
+      }
+    } catch (e) { showToast("Briefing failed"); }
+  }
+
+  // ==================== TELEMETRY ====================
+  function updateGauge(fillId, valId, pct, sysFillId, sysValId) {
+    const fill = $(fillId);
+    const val = $(valId);
+    if (!fill || !val) return;
+    const p = Math.round(pct || 0);
+    fill.style.width = p + "%";
+    fill.className = "gauge-fill" + (p > 85 ? " crit" : p > 65 ? " warn" : "");
+    val.textContent = p + "%";
+    // Also update system tab gauges if they exist
+    if (sysFillId) {
+      const sf = $(sysFillId);
+      const sv = $(sysValId);
+      if (sf) { sf.style.width = p + "%"; sf.className = fill.className; }
+      if (sv) { sv.textContent = p + "%"; }
+    }
+  }
+
+  function applyTelemetry(t) {
+    if (!t) return;
+    updateGauge("cpu-fill", "cpu-val", t.cpu_percent, "sys-cpu-fill", "sys-cpu-val");
+    updateGauge("ram-fill", "ram-val", t.ram_percent, "sys-ram-fill", "sys-ram-val");
+    updateGauge("disk-fill", "disk-val", t.disk_percent, "sys-disk-fill", "sys-disk-val");
+
+    if (t.battery_percent != null) {
+      $("batt-pct").textContent = Math.round(t.battery_percent) + "%";
+      const bf = $("sys-batt-fill");
+      const bv = $("sys-batt-val");
+      if (bf) { bf.style.width = Math.round(t.battery_percent) + "%"; }
+      if (bv) { bv.textContent = Math.round(t.battery_percent) + "%"; }
+    }
+    if (t.process_count) { $("proc-count").textContent = t.process_count; if ($("sys-procs")) $("sys-procs").textContent = t.process_count; }
+    if (t.uptime) { $("uptime-val").textContent = t.uptime; if ($("sys-uptime")) $("sys-uptime").textContent = t.uptime; }
+
+    // Network
+    const fmt = (b) => b > 1e9 ? (b/1e9).toFixed(1)+"G" : b > 1e6 ? (b/1e6).toFixed(1)+"M" : b > 1e3 ? (b/1e3).toFixed(1)+"K" : (b||0)+"B";
+    if (t.net_sent != null) { const v = fmt(t.net_sent)+"/s"; $("net-up-val").textContent = v; if($("sys-net-up")) $("sys-net-up").textContent = v; }
+    if (t.net_recv != null) { const v = fmt(t.net_recv)+"/s"; $("net-dn-val").textContent = v; if($("sys-net-dn")) $("sys-net-dn").textContent = v; }
+  }
+
+  // ==================== WEBSOCKET ====================
+  let ws = null;
+  function connectWS() {
+    const proto = location.protocol === "https:" ? "wss:" : "ws:";
+    ws = new WebSocket(`${proto}//${location.host}/ws`);
+
+    ws.onopen = () => { console.log("WS connected"); };
+
+    ws.onmessage = (ev) => {
+      let msg;
+      try { msg = JSON.parse(ev.data); } catch { return; }
+
+      switch (msg.type) {
+        case "snapshot":
+          if (msg.state) setStatus(msg.state);
+          if (msg.sessions) { sessions = msg.sessions; renderSessions(); }
+          if (msg.active) {
+            activeSessionId = msg.active.id;
+            currentSessionId = msg.active.id;
+            setActiveSession(msg.active.id);
+            setHeaderTitle(msg.active.title || msg.active.id);
+            messagesEl.innerHTML = "";
+            showEmptyState(false);
+            (msg.active.turns || []).forEach((t) => addBubble(t.role, t.content));
+          }
+          if (msg.telemetry) applyTelemetry(msg.telemetry);
+          break;
+
+        case "state":
+          setStatus(msg.state);
+          if (msg.state === "thinking") showTyping();
+          break;
+
+        case "message":
+          if (msg.role === "assistant") {
+            const tp = messagesEl.querySelector(".typing-row");
+            if (tp) tp.remove();
+            addBubble("assistant", msg.content);
+          } else if (msg.role === "user") {
+            // Only add if not already shown (typed commands show immediately)
+            addBubble("user", msg.content);
+          }
+          break;
+
+        case "session_start":
+          fetchSessions();
+          break;
+
+        case "session_end":
+          activeSessionId = null;
+          setActiveSession(null);
+          setHeaderTitle("");
+          fetchSessions();
+          break;
+
+        case "session_update":
+          fetchSessions();
+          break;
+
+        case "mute_state":
+          updateMuteUI(msg.muted);
+          break;
+
+        case "telemetry":
+          applyTelemetry(msg);
+          break;
+
+        case "orchestrator_event":
+          // Could show agent activity
+          break;
+      }
+    };
+
+    ws.onclose = () => {
+      console.warn("WS disconnected, retrying in 3s...");
+      setTimeout(connectWS, 3000);
+    };
+    ws.onerror = () => { ws.close(); };
+  }
+
+  // ==================== QUICK ACTIONS ====================
+  function openModal(html) {
+    const container = $("modal-container");
+    container.innerHTML = `<div class="modal-overlay" id="modal-overlay"><div class="modal">${html}</div></div>`;
+    $("modal-overlay").addEventListener("click", (e) => {
+      if (e.target === $("modal-overlay")) closeModal();
+    });
+  }
+  function closeModal() { $("modal-container").innerHTML = ""; }
+
+  const ACTION_HANDLERS = {
+    "email": () => {
+      openModal(`
+        <h3><i class="fa fa-envelope" style="color:var(--accent);"></i> Send Email</h3>
+        <label>To (name or email)</label>
+        <input type="text" id="email-to" placeholder="e.g. John or john@example.com" />
+        <label>Subject</label>
+        <input type="text" id="email-subject" placeholder="Subject line" />
+        <label>Message</label>
+        <textarea id="email-body" rows="3" placeholder="Type your message..."></textarea>
+        <div class="modal-actions">
+          <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="modal-btn primary" onclick="sendEmail()"><i class="fa fa-paper-plane"></i> Send</button>
+        </div>
+      `);
+    },
+    "web-build": () => {
+      openModal(`
+        <h3><i class="fa fa-globe" style="color:var(--accent);"></i> Build Website</h3>
+        <label>What kind of website?</label>
+        <textarea id="web-desc" rows="3" placeholder="e.g. A portfolio website for a photographer with a dark theme"></textarea>
+        <div class="modal-actions">
+          <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="modal-btn primary" onclick="buildWebsite()"><i class="fa fa-hammer"></i> Build</button>
+        </div>
+      `);
+    },
+    "search": () => {
+      openModal(`
+        <h3><i class="fa fa-search" style="color:var(--accent);"></i> Web Search</h3>
+        <label>What do you want to search for?</label>
+        <input type="text" id="search-query" placeholder="e.g. latest AI news" />
+        <div class="modal-actions">
+          <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="modal-btn primary" onclick="doSearch()"><i class="fa fa-search"></i> Search</button>
+        </div>
+      `);
+    },
+    "sysinfo": () => { sendText("system info"); },
+    "briefing": () => { getBriefing(); },
+    "files": () => { sendText("list my files"); },
+    "calculator": () => {
+      openModal(`
+        <h3><i class="fa fa-calculator" style="color:var(--accent);"></i> Calculator</h3>
+        <label>Expression</label>
+        <input type="text" id="calc-expr" placeholder="e.g. 2 * (3 + 4) ^ 2" />
+        <div class="modal-actions">
+          <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="modal-btn primary" onclick="doCalc()"><i class="fa fa-equals"></i> Calculate</button>
+        </div>
+      `);
+    },
+  };
+
+  function sendEmail() {
+    const to = $("email-to").value.trim();
+    const subject = $("email-subject").value.trim();
+    const body = $("email-body").value.trim();
+    if (!to || !body) { showToast("Fill in recipient and message"); return; }
+    closeModal();
+    const cmd = subject
+      ? `email ${to} subject ${subject} message ${body}`
+      : `email ${to} ${body}`;
+    sendText(cmd);
+  }
+
+  function buildWebsite() {
+    const desc = $("web-desc").value.trim();
+    if (!desc) { showToast("Describe the website you want"); return; }
+    closeModal();
+    sendText(`build a website: ${desc}`);
+  }
+
+  function doSearch() {
+    const q = $("search-query").value.trim();
+    if (!q) { showToast("Enter a search query"); return; }
+    closeModal();
+    sendText(`search ${q}`);
+  }
+
+  function doCalc() {
+    const expr = $("calc-expr").value.trim();
+    if (!expr) return;
+    closeModal();
+    sendText(`calculate ${expr}`);
+  }
+
+  // ==================== TABS ====================
+  function switchTab(tabId) {
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabId));
+    document.querySelectorAll(".tab-view").forEach(v => v.classList.toggle("active", v.id === "tab-" + tabId));
+    // If switching to home tab, make sure messages section is visible
+    if (tabId === "home") {
+      messagesEl.style.display = "";
+    }
+  }
+
+  // ==================== CLOCK ====================
+  function updateClock() {
+    const now = new Date();
+    $("hud-clock").textContent = now.toLocaleTimeString([], { hour12: false });
+    $("hud-date").textContent = now.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+  }
+
+  // ==================== INIT ====================
+  document.addEventListener("DOMContentLoaded", () => {
+    // Clock
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // WebSocket
+    connectWS();
+
+    // Fetch sessions
+    fetchSessions();
+
+    // Text form
+    const form = $("text-form");
+    const input = $("text-input");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      input.style.height = "40px";
+      sendText(text);
+    });
+    // Auto-resize + Enter to send
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        form.dispatchEvent(new Event("submit"));
+      }
+    });
+    input.addEventListener("input", () => {
+      input.style.height = "40px";
+      input.style.height = Math.min(input.scrollHeight, 120) + "px";
+    });
+
+    // Mute
+    $("mute-btn").addEventListener("click", toggleMute);
+
+    // End session
+    $("end-btn").addEventListener("click", endSession);
+
+    // Briefing button
+    $("briefing-btn").addEventListener("click", getBriefing);
+
+    // Refresh sessions
+    $("refresh-btn").addEventListener("click", fetchSessions);
+
+    // Quick action buttons
+    document.querySelectorAll(".action-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const action = btn.dataset.action;
+        const handler = ACTION_HANDLERS[action];
+        if (handler) handler();
+      });
+    });
+
+    // Nav tabs
+    document.querySelectorAll(".nav-tab").forEach((tab) => {
+      tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+    });
+
+    // Notes (persist in localStorage)
+    // Removed notes area in redesign — focus on actions
+
+    // Check mute state
+    fetch("/api/mute").then(r => r.json()).then(d => updateMuteUI(d.muted)).catch(() => {});
+
+    // Check backend status
+    fetch("/api/status").then(r => r.json()).then(d => {
+      if (d.llm_backend) {
+        $("backend-label").textContent = d.llm_backend.toUpperCase();
+      }
+    }).catch(() => {});
+  });
+</script>
+</body>
+</html>
