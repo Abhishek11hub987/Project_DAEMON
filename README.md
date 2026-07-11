@@ -148,6 +148,7 @@ Contributions welcome! Please follow:
 
 ## 📞 Support
 
+- ✉️ Email: ay2949032abhishekyadav@gmail.com
 - 📧 Issues: GitHub Issues
 - 💬 Discussions: GitHub Discussions
 
