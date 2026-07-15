@@ -46,6 +46,12 @@ run:
 test:
 	pytest tests/ -v
 
+test-smoke:
+	pytest tests/ -m smoke -v
+
+test-e2e:
+	pytest tests/ -m e2e -v
+
 test-coverage:
 	pytest tests/ --cov=. --cov-report=html
 
