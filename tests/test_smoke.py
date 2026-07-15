@@ -31,7 +31,8 @@ def test_llm_engine_connection():
     but mocks the connection in GitHub Actions to ensure a 3/3 pass."""
     if os.environ.get("GITHUB_ACTIONS") == "true":
         with patch("core_logic.llm_engine.LLMEngine.generate") as mock_gen, \
-             patch("core_logic.config.Config.LLM_BACKEND", "ollama"):
+             patch("core_logic.config.Config.LLM_BACKEND", "groq"), \
+             patch("core_logic.config.Config.GROQ_API_KEY", "dummy_key"):
             mock_gen.return_value = "pong"
             engine = LLMEngine()
             response = engine.generate("Reply exactly with the word PONG.", max_tokens=10)
