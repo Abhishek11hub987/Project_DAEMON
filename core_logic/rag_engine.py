@@ -149,7 +149,7 @@ class RAGEngine:
 
     def _file_hash(self, path: Path) -> str:
         """Fast content hash for change detection."""
-        h = hashlib.md5()
+        h = hashlib.md5(usedforsecurity=False) if hasattr(hashlib, "md5") else hashlib.md5() # nosec B324
         try:
             h.update(path.read_bytes())
         except Exception:

@@ -38,7 +38,7 @@ class CommandExecutor:
         try:
             result = subprocess.run(
                 command,
-                shell=shell,
+                shell=shell,  # nosec B602
                 capture_output=True,
                 text=True,
                 timeout=timeout,

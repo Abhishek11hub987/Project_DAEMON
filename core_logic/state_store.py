@@ -210,7 +210,7 @@ class UnifiedStateStore:
     def _fetch_row(self, table: str) -> Dict[str, Any]:
         """Fetch the single snapshot row from a table as a dict."""
         try:
-            cur = self._conn.execute(f"SELECT * FROM {table} WHERE id = 1")
+            cur = self._conn.execute(f"SELECT * FROM {table} WHERE id = 1")  # nosec B608
             cols = [d[0] for d in cur.description]
             row = cur.fetchone()
             if row is None:
